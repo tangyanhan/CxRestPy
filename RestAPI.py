@@ -9,7 +9,8 @@ from requests_toolbelt import MultipartEncoder
 
 class CxRestAPI(object):
 
-    def __init__(self):
+    def __init__(self, config_path):
+        self.config_path = config_path
         self.server, self.username, self.password = self.get_config()
         self.urls = self.get_urls()
         self.cookies = self.login()
@@ -24,7 +25,7 @@ class CxRestAPI(object):
         :return: List
         """
         try:
-            with open("etc/config.json") as config:
+            with open(self.config_path + '/config.json') as config:
                 conf = json.loads(config.read())
             server = conf.get("server")
             username = conf.get("username")
@@ -39,7 +40,7 @@ class CxRestAPI(object):
         :return: Dict
         """
         try:
-            with open("etc/urls.json") as urls:
+            with open(self.config_path + "/urls.json") as urls:
                 return json.loads(urls.read())
         except Exception as e:
             raise Exception("Unable to get configuration: {} . ".format(e))

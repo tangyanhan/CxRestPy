@@ -1,43 +1,67 @@
+import json
 import RestAPI
 import time
 import os
 
-cx = RestAPI.CxRestAPI()
+from zip import create_code_zip
 
-
-def choose_a_project():
-    num = 0
+def get_project_id(cx, project_name):
     project_list = cx.get_all_project_details()
     for project in project_list:
-        print("\t[{}] ".format(num), project.get("name"))
-        num += 1
-    num = int(input("- Choose a project:"))
-    return project_list[num].get("id"), project_list[num].get("name")
+        if project.get('name') == project_name:
+            return project.get('id')
+    return None
 
 
 def main():
+    cx_url = os.environ.get('CX_URL')
+    if not cx_url:
+        print('CX_URL is not set')
+        exit(1)
+
+    cx_username = os.environ.get('CX_USERNAME')
+    if not cx_username:
+        print('CX_USERNAME is not set')
+        exit(1)
+    cx_password = os.environ.get('CX_PASSWORD')
+    if not cx_password:
+        print('CX_PASSWORD is not set')
+        exit(1)
+
+    d = {
+        'server': cx_url + 'CxRestAPI',
+        'username': cx_username,
+        'password': cx_password
+    }
+
+    config_dir = os.environ.get('CX_CONFIG_DIR')
+    if not config_dir:
+        config_dir = './etc'
+    config_path = config_dir + '/config.json'
+    with open(config_path, 'w') as outfile:
+        json.dump(d, outfile)
+    
+    cx = RestAPI.CxRestAPI(config_dir)
+
     global project_name, team_id
-    print("* Welcome to use this scripts! *")
-    flag = input("- Do you want to create a new project?(Y/N)")
-    if flag.upper() == "Y":
-        teams = cx.get_all_teams().json()
-        num = 0
-        for team in teams:
-            print("\t[{}] ".format(num), team.get("fullName"))
-            num += 1
-        num = int(input("- Choose a team to create project:"))
-        team_id = teams[num].get("id")
-        project_name = input("- Set your project name:")
-        project_id = cx.create_project_with_default_configuration(name=project_name, owning_team=team_id).json().get("id")
-    else:
-        project_id, project_name = choose_a_project()
-    zip_path = input("- Set the zip file path:")
+    project_name = os.environ.get('CX_PROJECT_NAME')
+    if not project_name:
+        print('CX_PROJECT_NAME is not set')
+        exit(1)
+
+    project_id = get_project_id(cx, project_name)
+
+    if not project_id:
+        print('Failed to get project id with project name:', project_name)
+        exit(1)
+
+    cx_excludes = os.environ.get('CX_EXCLUDES')
+    if cx_excludes:
+        excludes = cx_excludes.split(',')
+    create_code_zip(excludes)
+    zip_path = 'code.zip'
     report_types = ["PDF", "RTF", "CSV", "XML"]
     report_code = 0
-    for type in report_types:
-        print("\t[{}]".format(report_code), type)
-        report_code += 1
-    report_code = int(input("- Choose a report type:"))
     cx.upload_source_code_zip_file(project_id=project_id, zip_path=zip_path)
     print("* Creating a new scan...")
     scan = cx.create_new_scan(project_id)

@@ -1,6 +1,16 @@
 # Checkmarx REST API SDK
 This is a Checkmarx REST API SDK implemented by Python 3.6.
 
+# Environments
+
+Env | Usage
+------|------
+CX_URL | Checkmarx URL,例如http://example.com/
+CX_USERNAME | Username
+CX_PASSWORD | Password
+CX_PROJECT_NAME | Checkmarx 上的项目名，搞错了分析结果会出现在其它项目里！
+CX_EXCLUDES | 分析不包括哪些文件，它们将不会被打包
+
 ---
 ## Getting Started
 ---
