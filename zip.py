@@ -10,6 +10,9 @@ def create_code_zip(excludes=[]):
                 if filename.startswith('.'):
                     continue
                 file_path = os.path.join(root, filename)
+                if os.path.islink(file_path):
+                    print('Skip symbol link:', file_path)
+                    continue
                 is_excluded = False
                 for exclude in excludes:
                     if file_path.startswith(exclude):
