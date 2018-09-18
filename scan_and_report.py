@@ -59,7 +59,7 @@ def main():
     if cx_excludes:
         excludes = cx_excludes.split(',')
     create_code_zip(excludes)
-    zip_path = 'code.zip'
+    zip_path = '/tmp/code.zip'
     report_types = ["PDF", "RTF", "CSV", "XML"]
     report_code = 0
     cx.upload_source_code_zip_file(project_id=project_id, zip_path=zip_path)

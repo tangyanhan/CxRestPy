@@ -3,7 +3,7 @@ import os
 
 def create_code_zip(excludes=[]):
     print('Start zipping code into code.zip...')
-    zf = zipfile.ZipFile('code.zip', mode='w')
+    zf = zipfile.ZipFile('/tmp/code.zip', mode='w')
     try:
         for root, dirs, files in os.walk('.'):
             for filename in files:
@@ -21,7 +21,7 @@ def create_code_zip(excludes=[]):
                 if not is_excluded:
                     zf.write(file_path)
     except Exception as e:
-        print('Exception when creating code.zip:', e)
+        print('Exception when creating /tmp/code.zip:', e)
         exit(1)
     finally:
         print('zip complete')
